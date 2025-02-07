@@ -6,10 +6,18 @@
   const userNameInput = document.getElementById('username');
   const messageContentInput = document.getElementById('message-content');
 
-  console.log('loginForm', loginForm);
-  console.log('messagesSection', messagesSection);
-  console.log('messageList', messageList);
-  console.log('addMessageForm', addMessageForm);
-  console.log('userNameInput', userNameInput);
-  console.log('messageContentInput', messageContentInput);
+  let userName = '';
+
+  const login = () => {
+    if(userNameInput.value.length === 0) {
+      prompt('Please give your name');
+    } else {
+      userName = userNameInput.value;
+    }
+  }
+
+  loginForm.addEventListener( e => {
+    e.preventDefault();
+    login();
+  })
 }
