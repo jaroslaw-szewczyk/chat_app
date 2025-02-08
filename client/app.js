@@ -8,7 +8,12 @@
 
   let userName = '';
 
-  const login = (e) => {
+  const socket = io();
+  
+  socket.on('message', ({ author, content }) => addMessage(author, content))
+  socket.on('newUser', ({bot, botMessage}) => addMessage(bot, botMessage));
+
+  function login (e) {
     e.preventDefault();
     if(!userNameInput.value) {
       alert('Please give your name');
@@ -16,10 +21,11 @@
       userName = userNameInput.value;
       loginForm.classList.remove('show');
       messagesSection.classList.add('show');
+      socket.emit('join', userName);
     }
   }
 
-  const addMessage = (author, content) => {
+  function addMessage (author, content) {
     const message = document.createElement('li'); 
     message.classList.add('message', 'message--received');
     if(author === userName) message.classList.add('message--self');
@@ -30,7 +36,7 @@
     headerAuthor.textContent = author;
 
     const newDiv = document.createElement('div'); 
-    newDiv.classList.add('message__content');
+    author === 'Chat Bot' ? newDiv.classList.add('message__content', 'chat--bot') : newDiv.classList.add('message__content');
     newDiv.textContent = content;
 
     message.appendChild(headerAuthor); 
@@ -39,12 +45,17 @@
     messageList.appendChild(message);
   }
 
-  const sendMessage = (e) => {
+  function sendMessage (e) {
     e.preventDefault();
-    if(!messageContentInput.value) {
-      alert('no message to send');
-    } else {
-      addMessage(userName, messageContentInput.value);
+
+    let messageContent = messageContentInput.value;
+
+    if(!messageContent.length) {
+      alert('You have to type something!');
+    }
+    else {
+      addMessage(userName, messageContent);
+      socket.emit('message', { author: userName, content: messageContent })
       messageContentInput.value = '';
     }
   }
@@ -52,4 +63,5 @@
   loginForm.addEventListener('submit', login);
 
   addMessageForm.addEventListener('submit', sendMessage);
+
 }
